@@ -2,24 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:shake/shake.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: ShakeDetectorDemo(),
     );
   }
 }
 
 class ShakeDetectorDemo extends StatefulWidget {
+  const ShakeDetectorDemo({super.key});
+
   @override
-  _ShakeDetectorDemoState createState() => _ShakeDetectorDemoState();
+  ShakeDetectorDemoState createState() => ShakeDetectorDemoState();
 }
 
-class _ShakeDetectorDemoState extends State<ShakeDetectorDemo> {
+class ShakeDetectorDemoState extends State<ShakeDetectorDemo> {
   ShakeDetector? _shakeDetector;
 
   @override
@@ -32,14 +36,14 @@ class _ShakeDetectorDemoState extends State<ShakeDetectorDemo> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text("Shake Detected"),
-            content: Text("You shook the device!"),
+            title: const Text("Shake Detected"),
+            content: const Text("You shook the device!"),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text("OK"),
+                child: const Text("OK"),
               ),
             ],
           ),
@@ -59,9 +63,9 @@ class _ShakeDetectorDemoState extends State<ShakeDetectorDemo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Shake Detector Demo"),
+        title: const Text("Shake Detector Demo"),
       ),
-      body: Center(
+      body: const Center(
         child: Text("Shake your device to see the effect!"),
       ),
     );
