@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shake/shake.dart';
+import 'package:sensors_plus/sensors_plus.dart';
+import 'dart:async';
+import 'dart:math';
 
 void main() {
   runApp(const MyApp());
@@ -24,38 +26,55 @@ class ShakeDetectorDemo extends StatefulWidget {
 }
 
 class ShakeDetectorDemoState extends State<ShakeDetectorDemo> {
-  ShakeDetector? _shakeDetector;
+  StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
+  static const double shakeThreshold = 15.0;
+  int _shakeCount = 0;
+  DateTime _lastShakeTime = DateTime.now();
 
   @override
   void initState() {
     super.initState();
-    // シェイク検出器を初期化し、シェイクが検出されたときのコールバックを設定します
-    _shakeDetector = ShakeDetector.autoStart(
-      onPhoneShake: () {
-        // シェイクが検出されたときの処理
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text("Shake Detected"),
-            content: const Text("You shook the device!"),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text("OK"),
-              ),
-            ],
+    _accelerometerSubscription =
+        //accelerometerEvents.listen((AccelerometerEvent event) {
+    accelerometerEventStream().listen((AccelerometerEvent event) {
+          final double acceleration =
+          sqrt(event.x * event.x + event.y * event.y + event.z * event.z);
+
+          if (acceleration > shakeThreshold) {
+            final DateTime now = DateTime.now();
+            if (now.difference(_lastShakeTime).inMilliseconds > 1000) {
+              _lastShakeTime = now;
+              _shakeCount++;
+              if (_shakeCount >= 2) {
+                _shakeCount = 0;
+                _onShakeDetected();
+              }
+            }
+          }
+        });
+  }
+
+  void _onShakeDetected() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Shake Detected"),
+        content: const Text("You shook the device!"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text("OK"),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 
   @override
   void dispose() {
-    // シェイク検出器を破棄します
-    _shakeDetector?.stopListening();
+    _accelerometerSubscription?.cancel();
     super.dispose();
   }
 
